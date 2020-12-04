@@ -1,22 +1,23 @@
 from color_manager import *
 from cmu_112_graphics import *
+from common import *
 from data_manager import *
 from enum import Enum
-from common import *
 from graph_page import *
 from home_page import *
+from image_manager import *
 from options_page import *
-from tkinter import filedialog
 
 def mousePressed(app, event):
+    print(event.x, event.y)
     if app.page == AppPage.Home:
         # todo: values should be variables imported
-        if 500 < event.x < 625 and 200 < event.y < 250:
-            path = filedialog.askopenfilename(initialdir=os.getcwd(), title='Select data file: ',filetypes = (('csv file','*.csv'),('all files','*.*')))
-            app.data = DataSet.load(path)
-            app.page = AppPage.Options
+        homePageMousePressed(app, event)
     elif app.page == AppPage.Options:
         optionsPageMousePressed(app, event)
+    elif app.page == AppPage.Graph:
+        graphPageMousePressed(app, event)
+
 
 def keyPressed(app, event):
     if event.key == 'm':
@@ -39,9 +40,10 @@ def timerFired(app):
     if app.go:
         app.counter += 1
 
-
 def appStarted(app):
     app.page = AppPage.Options
+    app.colorManager = ColorManager()
+    app.imageManager = ImageManager.load(app)
     # Home
     app.dataPath = None
 
@@ -50,7 +52,6 @@ def appStarted(app):
 
     # Graph
     app.data = DataSet.load('nba_stats.csv')
-    app.colorManager = ColorManager()
     app.go = False
     app.counter = 1
 
@@ -59,6 +60,7 @@ def redrawAll(app, canvas):
         drawHome(app, canvas)
     if app.page == AppPage.Options:
         drawOptions(app, canvas)
+        drawHeaders(app, canvas)
     elif app.page == AppPage.Graph:
         if app.options.mode == GraphMode.Histogram:
             drawHistogram(app, canvas)

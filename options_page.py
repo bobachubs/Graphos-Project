@@ -1,22 +1,29 @@
 from common import *
+from PIL import Image, ImageTk
 
 relevantFields = ['FGA', 'PTS', 'AST', 'PLUS_MINUS']
+
+def drawBackButtonHome(app, canvas):
+    canvas.create_image(75, 50, image=ImageTk.PhotoImage(app.imageManager.getImage('arrow')))
 
 def xVariableButtonPositions(xVariables):
     positions = []
 
-    x = 200
+    x = 350
     y = 500
     boxWidth = 100
     boxHeight = 50
     for xVar in xVariables:
-        positions.append((x - boxWidth/2, y-boxHeight/2, x + boxWidth/2, y + boxHeight / 2))
+        positions.append((x - boxWidth/2, y-boxHeight/2, x + boxWidth/2, y + boxHeight/2))
         y += boxHeight
 
     return positions
 
 def optionsPageMousePressed(app, event):
-    if 200 < event.y < 250:
+    if 50 < event.x < 100 and 30 < event.y < 70:
+        app.page = AppPage.Home
+        return
+    elif 200 < event.y < 250:
         app.options.mode = GraphMode.Histogram
         app.options.x = None
         app.options.y = None
@@ -26,8 +33,6 @@ def optionsPageMousePressed(app, event):
         app.options.y = None
     elif 300 < event.y < 350:
         app.options.mode = GraphMode.Bar
-        app.options.x = None
-        app.options.y = None
 
     for (idx, (x0, y0, x1, y1)) in enumerate(xVariableButtonPositions(relevantFields)):
         if x0 < event.x < x1 and y0 < event.y < y1:
@@ -39,6 +44,7 @@ def optionsPageMousePressed(app, event):
         app.page = AppPage.Graph
 
 def drawOptions(app, canvas):
+    drawBackButtonHome(app, canvas)
     modes = [
         ('HISTOGRAM', GraphMode.Histogram),
         ('SCATTERPLOT', GraphMode.Scatter),
@@ -49,8 +55,8 @@ def drawOptions(app, canvas):
     y = 200
     r = 10
     for (modeString, mode) in modes:
-        canvas.create_text(x, y, text=modeString, font='Arial 22 bold', anchor='nw')
-        canvas.create_oval(x-r, y-r, x+r, y+r, fill='black' if app.options.mode == mode else None) 
+        canvas.create_text(x, y, text=modeString, font='Arial 26 bold', anchor='nw')
+        canvas.create_oval(x-r-50, y-r+10, x+r-40, y+r+20, fill='black' if app.options.mode == mode else None) 
         y += 50
 
     if not app.options.mode:
@@ -62,8 +68,13 @@ def drawOptions(app, canvas):
         canvas.create_rectangle(x0, y0, x1, y1, fill='black' if app.options.x == xVar else None)
         canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=xVar, fill='white' if app.options.x == xVar else 'black')
 
-
-
+def drawHeaders(app, canvas):
+    # draw titles and headings
+    canvas.create_text(app.width/2, 50, text='PICK YOUR DISPLAY', font='Arial 34 bold')
+    canvas.create_text(80, 120, text='VISUALIZATION MODE', font='Arial 26 bold', anchor='nw')
+    canvas.create_text(80, 380, text='SELECT YOUR VARIABLES', font='Arial 24 bold', anchor = 'nw')
+    canvas.create_text(210, 550, text='X: ', font='Arial 100')
+    canvas.create_text(550, 550, text='Y: ', font='Arial 100')
 '''
 class OptionsMenuMode(Mode):
     def appStarted(mode):

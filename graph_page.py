@@ -1,5 +1,15 @@
+from PIL import Image, ImageTk
+from common import *
+
+def drawBackButton(app, canvas):
+    canvas.create_image(75, 50, image=ImageTk.PhotoImage(app.imageManager.getImage('arrow')))
+
+def graphPageMousePressed(app, event):
+    if 50 < event.x < 100 and 30 < event.y < 70:
+        app.page = AppPage.Options
 
 def drawHistogram(app, canvas):
+    drawBackButton(app, canvas)
     histogramBuckets = app.data.getHistogram(app.options.x)
     maxValue = max([e[1] for e in histogramBuckets])
     pad = 40
@@ -24,6 +34,7 @@ def drawHistogram(app, canvas):
     canvas.create_text(app.width/2, 20, text=f'NBA {app.options.x} Histogram', font='Arial 16')
 
 def drawScatter(app, canvas):
+    drawBackButton(app, canvas)
     (points, xMin, xMax, yMin, yMax) = app.data.getScatterData('FGA', 'PTS')
     pad = 40
 
@@ -47,6 +58,7 @@ def drawScatter(app, canvas):
     canvas.create_text(app.width/2, 20, text=f'NBA FGA-PTS Scatterplot', font='Arial 16')
 
 def drawBar(app, canvas):
+    drawBackButton(app, canvas)
     #playerPoints = app.data.nbaPlayerPoints()
     playerPoints = app.data.getAggregates('PLAYER_NAME', 'PTS')
     pointLeaders = sorted(playerPoints.items(), key=lambda p: p[1], reverse=True)[:10]

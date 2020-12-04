@@ -31,11 +31,17 @@ with open('games_details.csv') as csvfile:
         row.append(gameDate)
         dataRows.append(row)
 
+fieldsToKeep = ['TEAM_ABBREVIATION', 'PLAYER_NAME', 'FGM', 'FGA', 'FTM', 'FTA', 'OREB', 'REB', 'AST', 'PTS', 'PLUS_MINUS', 'TIME']
+fieldIndicesToRemove = [i for i,v in enumerate(fieldRow) if v not in fieldsToKeep]
+fieldIndicesToRemove.reverse()
+
 # sort rows based on time
 dataRows.sort(key=lambda row: row[-1])
 
-with open('nba_stats.csv', 'wb') as csvfile:
+with open('nba_stats.csv', 'w') as csvfile:
     writer = csv.writer(csvfile, delimiter=',')
-    writer.writerow(fieldRow)
+    writer.writerow(fieldsToKeep)
     for row in dataRows:
+        for idx in fieldIndicesToRemove:
+            row.pop(idx)
         writer.writerow(row)

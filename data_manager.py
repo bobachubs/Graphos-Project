@@ -7,7 +7,6 @@ class DataField:
         self.name = name
         self.isNumeric = isNumeric
 
-
 class DataSet:
     def __init__(self, fields, data):
         self.fields = fields
@@ -23,6 +22,7 @@ class DataSet:
 
         histogramCounts = {}
         idx = next(i for i,v in enumerate(self.fields) if v.name == fieldString)
+        print(fieldString, idx, key)
         for row in self.data:
             try:
                 value = 0 if not row[idx] else float(row[idx])
@@ -56,9 +56,9 @@ class DataSet:
 
         histogramBuckets = []
         for bucket in numericBuckets:
-            key = f'{bucket[0]}-{bucket[1]}' if bucketRange > 1 else str(bucket[0])
+            bucketKey = f'{bucket[0]}-{bucket[1]}' if bucketRange > 1 else str(bucket[0])
             count = bucket[2]
-            histogramBuckets.append((key, count))
+            histogramBuckets.append((bucketKey, count))
 
         self.cache[key] = histogramBuckets
         return histogramBuckets
