@@ -64,9 +64,9 @@ class DataSet:
         return histogramBuckets
 
     # returns a tuple ([(x, y), ...], xMin, xMax, yMin, yMax]
-    def getScatterData(self, xfieldString, yfieldString):
+    def getScatterData(self, xfieldString, yfieldString, xMinOpt=None, xMaxOpt=None, yMinOpt=None, yMaxOpt=None):
         # assumes both x, y are numeric
-        key = f'{xfieldString}-{yfieldString}-scatterplot'
+        key = f'{xfieldString}-{yfieldString}-{xMinOpt}-{xMaxOpt}-{yMinOpt}-{yMaxOpt}-scatterplot'
         if key in self.cache:
             return self.cache[key]
 
@@ -84,7 +84,16 @@ class DataSet:
                 y = 0 if not row[yIdx] else float(row[yIdx])
             except:
                 continue
-            
+
+            if xMinOpt != None and x < xMinOpt:
+                continue
+            if xMaxOpt != None and x > xMaxOpt:
+                continue
+            if yMinOpt != None and y < yMinOpt:
+                continue
+            if yMaxOpt != None and y > yMaxOpt:
+                continue
+
             points.add((x, y))
             xMin = min(xMin, x)
             xMax = max(xMax, x)

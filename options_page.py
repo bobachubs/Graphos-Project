@@ -8,6 +8,8 @@ modes = [
     ('Bar Groups', GraphMode.Groups),
 ]
 
+scatterRangeAttributes = ['xMin', 'xMax', 'yMin', 'yMax']
+
 def modeButtonPositions():
     positions = []
 
@@ -59,11 +61,25 @@ def groupButtonPositions(fieldStrings):
 
     return positionsG
 
+def scatterRangeButtonPositions():
+    positionsR = []
+
+    x = 800
+    y = 350
+    boxWidth = 150
+    boxHeight = 40
+    for value in scatterRangeAttributes:
+        positionsR.append((x + boxWidth/2, y-boxHeight/2, x + 3*boxWidth/2, y + boxHeight/2))
+        y += boxHeight
+
+    return positionsR
+
 def optionsPageMousePressed(app, event):
     # back button
     if 50 < event.x < 100 and 30 < event.y < 70:
         app.page = AppPage.Home
         return
+
     # go button
     if 1180 < event.x < 1230 and 730 < event.y < 770:
       if app.options.mode == GraphMode.Histogram:
@@ -76,13 +92,12 @@ def optionsPageMousePressed(app, event):
           if app.options.x != None and app.options.y != None:
               app.page = AppPage.Graph
 
-
     # mode selection
     for (idx, (x0, y0, x1, y1)) in enumerate(modeButtonPositions()):
         if x0 < event.x < x1 and y0 < event.y < y1:
-            app.options.mode = modes[idx][1]
-            app.options.x = None
-            app.options.y = None
+            newOptions = GraphOptions()
+            newOptions.mode = modes[idx][1]
+            app.options = newOptions
             break
 
     # x-variable selection
@@ -97,25 +112,40 @@ def optionsPageMousePressed(app, event):
             break
 
     # y-variable selection
-    yVariables = [f.name for f in app.data.fields if f.isNumeric]
-    positionsY = yVariableButtonPositions(yVariables)
-    for (idx, (x0, y0, x1, y1)) in enumerate(positionsY):
-        if x0 < event.x < x1 and y0 < event.y < y1:
-            app.options.y = yVariables[idx]
-            break
+    if app.options.mode != GraphMode.Histogram:
+        yVariables = [f.name for f in app.data.fields if f.isNumeric]
+        positionsY = yVariableButtonPositions(yVariables)
+        for (idx, (x0, y0, x1, y1)) in enumerate(positionsY):
+            if x0 < event.x < x1 and y0 < event.y < y1:
+                app.options.y = yVariables[idx]
+                break
 
     # group selection
-    gVariables = [f.name for f in app.data.fields if f.name.lower() in ['time', 'date']]
-    positionsG = groupButtonPositions(gVariables)
-    for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):
-        if x0 < event.x < x1 and y0 < event.y < y1:
-            app.options.group = gVariables[idx]
-            break
+    if app.options.mode == GraphMode.Groups:
+        gVariables = [f.name for f in app.data.fields if f.name.lower() in ['time', 'date']]
+        positionsG = groupButtonPositions(gVariables)
+        for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):
+            if x0 < event.x < x1 and y0 < event.y < y1:
+                app.options.group = gVariables[idx]
+                break
+
+    # scatter range selection
+    if app.options.mode == GraphMode.Scatter:
+        positionsR = scatterRangeButtonPositions()
+        for (idx, (x0, y0, x1, y1)) in enumerate(positionsR):
+            attribute = scatterRangeAttributes[idx]
+            if x0 < event.x < x1 and y0 < event.y < y1:
+                try:
+                    inputValue = float(app.getUserInput(attribute))
+                except:
+                    inputValue = None
+                setattr(app.options, attribute, inputValue)
+                break
 
 def drawOptions(app, canvas):
-    # Back button
     canvas.create_image(75, 50, image=ImageTk.PhotoImage(app.imageManager.getImage('arrow')))
-    canvas.create_image(1205, 750, image=ImageTk.PhotoImage(app.imageManager.getImage('go')))
+    if app.options.mode:
+        canvas.create_image(1205, 750, image=ImageTk.PhotoImage(app.imageManager.getImage('go')))
 
     # Modes
     canvas.create_text(80, 100, text='Graph Mode', font='Arial 22 bold', anchor='w')
@@ -161,16 +191,23 @@ def drawOptions(app, canvas):
         canvas.create_rectangle(x0, y0, x1, y1, fill='black' if app.options.y == yVar else None)
         canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=yVar, fill='white' if app.options.y == yVar else 'black')
 
-    if app.options.mode != GraphMode.Groups:
-        return
-
     # group option
-    canvas.create_text(720, 300, text='Group', font='Arial 22 bold', anchor='w')
+    if app.options.mode == GraphMode.Groups:
+        canvas.create_text(720, 300, text='Group', font='Arial 22 bold', anchor='w')
 
-    gVariables = [f.name for f in app.data.fields if f.name.lower() in ['time', 'date']]
+        gVariables = [f.name for f in app.data.fields if f.name.lower() in ['time', 'date']]
 
-    positionsG = groupButtonPositions(gVariables)
-    for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):
-        gVar = gVariables[idx]
-        canvas.create_rectangle(x0, y0, x1, y1, fill='black' if app.options.group == gVar else None)
-        canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=gVar, fill='white' if app.options.group == gVar else 'black')
+        positionsG = groupButtonPositions(gVariables)
+        for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):
+            gVar = gVariables[idx]
+            canvas.create_rectangle(x0, y0, x1, y1, fill='black' if app.options.group == gVar else None)
+            canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=gVar, fill='white' if app.options.group == gVar else 'black')
+
+    # scatter range option
+    if app.options.mode == GraphMode.Scatter:
+        canvas.create_text(720, 300, text='Y-Range', font='Arial 22 bold', anchor='w')
+        positionsR = scatterRangeButtonPositions()
+        for (idx, (x0, y0, x1, y1)) in enumerate(positionsR):
+            attribute = scatterRangeAttributes[idx]
+            canvas.create_rectangle(x0, y0, x1, y1)
+            canvas.create_text((x0+x1)/2, (y0+y1)/2, text=f'{attribute}={getattr(app.options, attribute)}')

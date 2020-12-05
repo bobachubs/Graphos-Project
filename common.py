@@ -17,3 +17,7 @@ class GraphOptions:
         self.x = None
         self.y = None
         self.group = None
+        self.xMin = None
+        self.xMax = None
+        self.yMin = None
+        self.yMax = None

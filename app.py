@@ -18,6 +18,9 @@ def mousePressed(app, event):
         graphPageMousePressed(app, event)
 
 
+def mouseMoved(app, event):
+    app.mouseMovedEvent = event
+
 def keyPressed(app, event):
     if event.key == 'm':
         app.animate = False
@@ -43,6 +46,8 @@ def appStarted(app):
     app.page = AppPage.Home
     app.colorManager = ColorManager()
     app.imageManager = ImageManager.load(app)
+    app.mouseMovedEvent = None
+
     # Home
     app.dataPath = None
 
@@ -50,6 +55,7 @@ def appStarted(app):
     app.options = GraphOptions()
 
     # Graph
+    # todo remove later
     app.data = DataSet.load('nba_stats.csv')
     app.animate = False
     app.groupIdx = 1
