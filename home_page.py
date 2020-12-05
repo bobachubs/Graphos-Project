@@ -19,13 +19,17 @@ def drawHome(app, canvas):
     canvas.create_rectangle(500, 200, 625, 250, width=3)
     canvas.create_text(562, 225, text='  Livestream \n Twitter Data', font='22')
     canvas.create_rectangle(850, 200, 975, 250, width=3)
-    canvas.create_text(912, 225, text='  View NBA \n Point Leaders', font='22')
+    canvas.create_text(912, 225, text='  View NBA \n    Data', font='22')
 
 def homePageMousePressed(app, event):
-    if 575 < event.x < 700 and 600 < event.y < 700:
+    if 850 < event.x < 975 and 200 < event.y < 250:
+        app.data = DataSet.load('nba_stats.csv')
+        app.page = AppPage.Options
+    elif 575 < event.x < 700 and 600 < event.y < 700:
         path = filedialog.askopenfilename(initialdir=os.getcwd(), title='Select data file: ',filetypes = (('csv file','*.csv'),('all files','*.*')))
         if path == '': 
             pass
         else:
             app.data = DataSet.load(path)
             app.page = AppPage.Options
+            app.options = GraphOptions()

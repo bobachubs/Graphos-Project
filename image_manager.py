@@ -14,11 +14,13 @@ class ImageManager:
         
 
         imageArrow = app.scaleImage(app.loadImage('images/arrow.png'), 1)
+        imageArrowGo = app.scaleImage(app.loadImage('images/go.png'), 1)
         imageTwitter = app.scaleImage(app.loadImage('images/twitter.png'), 1)
         imageNBA = app.scaleImage(app.loadImage('images/nba.png'), 1)
         imageFile = app.scaleImage(app.loadImage('images/file.png'), 1)
 
         imageManager.cache['arrow'] = imageArrow
+        imageManager.cache['go'] = imageArrowGo
         imageManager.cache['twitter'] = imageTwitter
         imageManager.cache['NBA'] = imageNBA
         imageManager.cache['file'] = imageFile

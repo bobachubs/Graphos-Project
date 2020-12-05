@@ -12,7 +12,7 @@ def modeButtonPositions():
     positions = []
 
     x = 120
-    y = 120
+    y = 140
     boxWidth = 400
     boxHeight = 40
     for _ in modes:
@@ -24,7 +24,7 @@ def xVariableButtonPositions(fieldStrings):
     positionsX = []
 
     x = 80
-    y = 300
+    y = 350
     boxWidth = 150
     boxHeight = 40
     for xVar in fieldStrings:
@@ -37,7 +37,7 @@ def yVariableButtonPositions(fieldStrings):
     positionsY = []
 
     x = 400
-    y = 300
+    y = 350
     boxWidth = 150
     boxHeight = 40
     for yVar in fieldStrings:
@@ -50,7 +50,7 @@ def groupButtonPositions(fieldStrings):
     positionsG = []
 
     x = 720
-    y = 300
+    y = 350
     boxWidth = 150
     boxHeight = 40
     for yVar in fieldStrings:
@@ -64,6 +64,18 @@ def optionsPageMousePressed(app, event):
     if 50 < event.x < 100 and 30 < event.y < 70:
         app.page = AppPage.Home
         return
+    # go button
+    if 1180 < event.x < 1230 and 730 < event.y < 770:
+      if app.options.mode == GraphMode.Histogram:
+          if app.options.x != None:
+              app.page = AppPage.Graph
+      elif app.options.mode == GraphMode.Groups:
+          if all((var is not None for var in [app.options.x, app.options.y, app.options.group])):
+              app.page = AppPage.Graph
+      else:
+          if app.options.x != None and app.options.y != None:
+              app.page = AppPage.Graph
+
 
     # mode selection
     for (idx, (x0, y0, x1, y1)) in enumerate(modeButtonPositions()):
@@ -93,30 +105,20 @@ def optionsPageMousePressed(app, event):
             break
 
     # group selection
-    gVariables = [f.name for f in app.data.fields if f.isNumeric or f.name.lower() == 'time']
+    gVariables = [f.name for f in app.data.fields if f.name.lower() in ['time', 'date']]
     positionsG = groupButtonPositions(gVariables)
     for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):
         if x0 < event.x < x1 and y0 < event.y < y1:
             app.options.group = gVariables[idx]
             break
 
-    # todo: auto or button to move to graph page?
-    if app.options.mode == GraphMode.Histogram:
-        if app.options.x != None:
-            app.page = AppPage.Graph
-    elif app.options.mode == GraphMode.Groups:
-        if all((var is not None for var in [app.options.x, app.options.y, app.options.group])):
-            app.page = AppPage.Graph
-    else:
-        if app.options.x != None and app.options.y != None:
-            app.page = AppPage.Graph
-
 def drawOptions(app, canvas):
     # Back button
     canvas.create_image(75, 50, image=ImageTk.PhotoImage(app.imageManager.getImage('arrow')))
+    canvas.create_image(1205, 750, image=ImageTk.PhotoImage(app.imageManager.getImage('go')))
 
     # Modes
-    canvas.create_text(80, 80, text='Graph Mode', font='Arial 22 bold', anchor='w')
+    canvas.create_text(80, 100, text='Graph Mode', font='Arial 22 bold', anchor='w')
 
     for (idx, (x0, y0, x1, y1)) in enumerate(modeButtonPositions()):
         buttonHeight = y1 - y0
@@ -165,7 +167,7 @@ def drawOptions(app, canvas):
     # group option
     canvas.create_text(720, 300, text='Group', font='Arial 22 bold', anchor='w')
 
-    gVariables = [f.name for f in app.data.fields if f.isNumeric or f.name.lower() == 'time']
+    gVariables = [f.name for f in app.data.fields if f.name.lower() in ['time', 'date']]
 
     positionsG = groupButtonPositions(gVariables)
     for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):

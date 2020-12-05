@@ -53,6 +53,7 @@ def appStarted(app):
     app.data = DataSet.load('nba_stats.csv')
     app.animate = False
     app.groupIdx = 1
+    app.timerDelay = 100
 
 def redrawAll(app, canvas):
     if app.page == AppPage.Home:
