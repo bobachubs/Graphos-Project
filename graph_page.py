@@ -7,6 +7,9 @@ def drawBackButton(app, canvas):
 def graphPageMousePressed(app, event):
     if 50 < event.x < 100 and 30 < event.y < 70:
         app.page = AppPage.Options
+        # reset group animation
+        app.groupIdx = 1
+        app.animate = False
 
 def drawHistogram(app, canvas):
     drawBackButton(app, canvas)
@@ -31,11 +34,33 @@ def drawHistogram(app, canvas):
         canvas.create_text((x0 + x1) / 2, y1 - pad / 2, text=str(value))
         x0 += barWidth
 
-    canvas.create_text(app.width/2, 20, text=f'NBA {app.options.x} Histogram', font='Arial 16')
+    canvas.create_text(app.width/2, 20, text=f'Histogram - {app.options.x}', font='Arial 16')
+
+def drawRegressionEquation(app, canvas):
+    (points, xMin, xMax, yMin, yMax) = app.data.getScatterData(app.options.x, app.options.y)
+    xList, yList = [], []
+
+    for (px, py) in points:
+        xList += [px]
+        yList += [py]
+
+    meanX = sum(xList)/len(xList)
+    meanY = sum(yList)/len(yList)
+
+    SSxx = 0
+    SSxy = 0
+
+    for idx in range(max(len(xList), len(yList))):
+        SSxx += (xList[idx]-meanX)**2
+        SSxy += (yList[idx]-meanY)*(xList[idx]-meanX)
+
+    slope = round(SSxy/SSxx, 2)
+    b = round(meanY - slope * meanX, 2)
+    canvas.create_text(800, 200, text = f'{app.options.y} = {slope}*{app.options.x} + {b}', anchor = 'w', font = 'Arial 14')
 
 def drawScatter(app, canvas):
     drawBackButton(app, canvas)
-    (points, xMin, xMax, yMin, yMax) = app.data.getScatterData('FGA', 'PTS')
+    (points, xMin, xMax, yMin, yMax) = app.data.getScatterData(app.options.x, app.options.y)
     pad = 40
 
     graphWidth = app.width - pad * 2
@@ -45,68 +70,97 @@ def drawScatter(app, canvas):
 
     # x-axis
     canvas.create_line(pad, app.height - pad - graphHeight, pad, app.height - pad)
-    canvas.create_text(app.width / 2, app.height - pad/2, text='FGA')
+    canvas.create_text(app.width / 2, app.height - pad/2, text=app.options.x)
     # y-axis
     canvas.create_line(pad, app.height - pad, app.width - pad, app.height - pad)
-    canvas.create_text(pad, app.height - pad - graphHeight - 20, text='PTS')
+    canvas.create_text(pad, app.height - pad - graphHeight - 20, text=app.options.y)
 
     for (px, py) in points:
         x = pad + (px - xMin) * widthRatio
         y = app.height - pad - (py - yMin) * heightRatio
         canvas.create_oval(x-2, y-2, x+2, y+2)
 
-    canvas.create_text(app.width/2, 20, text=f'NBA FGA-PTS Scatterplot', font='Arial 16')
+    canvas.create_text(app.width/2, 20, text=f'Scatterplot - {app.options.x}-{app.options.y}', font='Arial 16')
+
+    # linear regression line
+    xList, yList = [], []
+
+    for (px, py) in points:
+        x = pad + (px - xMin)*widthRatio
+        y = app.height-pad-(py-yMin)*heightRatio
+        xList += [x]
+        yList += [y]
+
+    meanX = sum(xList)/len(xList)
+    meanY = sum(yList)/len(yList)
+
+    SSxx = 0
+    SSxy = 0
+
+    for idx in range(max(len(xList), len(yList))):
+        SSxx += (xList[idx]-meanX)**2
+        SSxy += (yList[idx]-meanY)*(xList[idx]-meanX)
+
+    slope = SSxy/SSxx
+
+    b = meanY - slope * meanX
+
+    pointStartX, pointEndX = 0, graphWidth
+    pointStartY, pointEndY = (slope*(0+pad) + b), (slope*(pad + graphWidth) + b)
+    canvas.create_line(pad + pointStartX, pointStartY,
+                       pad + graphWidth, pointEndY)
+    canvas.create_text(app.width/2, 40, text=f'NBA {app.options.x}-{app.options.y} Linear Regression', font='Arial 10')
+
+    drawRegressionEquation(app, canvas)
 
 def drawBar(app, canvas):
     drawBackButton(app, canvas)
-    #playerPoints = app.data.nbaPlayerPoints()
-    playerPoints = app.data.getAggregates('PLAYER_NAME', 'PTS')
-    pointLeaders = sorted(playerPoints.items(), key=lambda p: p[1], reverse=True)[:10]
+    aggregates = app.data.getAggregates(app.options.x, app.options.y)
+    leaders = sorted(aggregates.items(), key=lambda p: p[1], reverse=True)[:10]
 
     # Draw rectangles from the left proportional to the target ratio
     fullWidth = app.width - 40
-    topStat = pointLeaders[0][1]
+    topStat = leaders[0][1]
     ratio = fullWidth / topStat * 0.8
 
     h = 100
-    for (player, points) in pointLeaders:
+    for (xvar, yvar) in leaders:
         x0 = 20
         y0 = h
-        x1 = 20 + points * ratio
+        x1 = 20 + yvar * ratio
         y1 = h + 50
-        color = app.colorManager.getColor(player)
+        color = app.colorManager.getColor(xvar)
 
         canvas.create_rectangle(x0, y0, x1, y1, fill=color)
-        canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=player, font='Arial 12')
-        canvas.create_text(x1 + 20 , (y0 + y1) / 2, text=str(points), font='Arial 12')
+        canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=xvar, font='Arial 12')
+        canvas.create_text(x1 + 20 , (y0 + y1) / 2, text=str(yvar), font='Arial 12')
         h += 60
 
-    canvas.create_text(app.width/2, 20, text=f'NBA Point Leaders', font='Arial 16')
+    canvas.create_text(app.width/2, 20, text=f'Bar - {app.options.y} by {app.options.x}', font='Arial 16')
 
-def drawTimeline(app, canvas):
-    #playerPoints = app.data.nbaPlayerPoints()
-    timeline = app.data.getAggregatesTimeline('PLAYER_NAME', 'PTS')
-    idx = min(len(timeline), app.counter)
-    (time, aggregates) = timeline[idx]
-    pointLeaders = sorted(aggregates.items(), key=lambda p: p[1], reverse=True)[:10]
+def drawGroups(app, canvas):
+    groups = app.data.getAggregatesGroups(app.options.x, app.options.y, app.options.group)
+    idx = min(len(groups), app.groupIdx)
+    (group, aggregates) = groups[idx]
+    leaders = sorted(aggregates.items(), key=lambda p: p[1], reverse=True)[:10]
 
     # Draw rectangles from the left proportional to the target ratio
     fullWidth = app.width - 40
-    topStat = pointLeaders[0][1]
-    ratio = fullWidth / topStat * 0.8
+    topStat = leaders[0][1]
+    ratio = 0 if topStat == 0 else fullWidth / topStat * 0.8
 
     h = 100
-    for (player, points) in pointLeaders:
+    for (xvar, yvar) in leaders:
         x0 = 20
         y0 = h
-        x1 = 20 + points * ratio
+        x1 = 20 + yvar * ratio
         y1 = h + 50
-        color = app.colorManager.getColor(player)
+        color = app.colorManager.getColor(xvar)
 
         canvas.create_rectangle(x0, y0, x1, y1, fill=color)
-        canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=player, font='Arial 12')
-        canvas.create_text(x1 + 20 , (y0 + y1) / 2, text=str(points), font='Arial 12')
+        canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=xvar, font='Arial 12')
+        canvas.create_text(x1 + 20 , (y0 + y1) / 2, text=str(yvar), font='Arial 12')
         h += 60
 
-    canvas.create_text(app.width/2, 20, text=f'NBA Point Leaders Timeline', font='Arial 16')
-    canvas.create_text(40, 40, text=time, font='Arial 14')
+    canvas.create_text(app.width/2, 20, text=f'{app.options.y} by {app.options.x} over {app.options.group}', font='Arial 16')
+    canvas.create_text(40, 40, text=f'{app.options.group}={group}', font='Arial 14', anchor='w')

@@ -22,7 +22,6 @@ class DataSet:
 
         histogramCounts = {}
         idx = next(i for i,v in enumerate(self.fields) if v.name == fieldString)
-        print(fieldString, idx, key)
         for row in self.data:
             try:
                 value = 0 if not row[idx] else float(row[idx])
@@ -38,6 +37,7 @@ class DataSet:
         maxValue = math.ceil(max(histogramCounts.keys()))
 
         if maxValue - minValue < 11:
+            bucketRange = 1
             numericBuckets = [[v, v + 1, 0] for v in range(minValue, maxValue)]
         else:
             bucketRange = math.floor((maxValue -  minValue) / 11)
@@ -56,7 +56,7 @@ class DataSet:
 
         histogramBuckets = []
         for bucket in numericBuckets:
-            bucketKey = f'{bucket[0]}-{bucket[1]}' if bucketRange > 1 else str(bucket[0])
+            bucketKey = f'{bucket[0]}->{bucket[1]}' if bucketRange > 1 else str(bucket[0])
             count = bucket[2]
             histogramBuckets.append((bucketKey, count))
 
@@ -120,43 +120,43 @@ class DataSet:
         self.cache[key] = aggregates
         return aggregates
 
-    # returns a list of cumulative aggregates as they appeared in time
-    # [(time, {'x', yAggregate}, ...]
-    def getAggregatesTimeline(self, xfieldString, yfieldString):
-        # assumes data is already sorted by time
-        key = f'{xfieldString}-{yfieldString}-timeline'
+    # returns a list of cumulative aggregates as they appear in groups, sorted by group
+    # [(group0, {'x', yAggregate}, ...]
+    def getAggregatesGroups(self, xfieldString, yfieldString, groupFieldString):
+        key = f'{xfieldString}-{yfieldString}-{groupFieldString}-groups'
         if key in self.cache:
             return self.cache[key]
 
-        tIdx = next(i for i,v in enumerate(self.fields) if v.name == "TIME")
+        gIdx = next(i for i,v in enumerate(self.fields) if v.name == groupFieldString)
         xIdx = next(i for i,v in enumerate(self.fields) if v.name == xfieldString)
         yIdx = next(i for i,v in enumerate(self.fields) if v.name == yfieldString)
 
-        timeline = []
-        tAggregates = {}
-        currentTime = None
-        for row in self.data:
-            t = row[tIdx]
+        groups = []
+        gAggregates = {}
+        currentGroup = None
+        sortedData = sorted(self.data, key=lambda x: x[gIdx])
+        for row in sortedData:
+            g = row[gIdx]
             x = row[xIdx]
             try:
                 y = 0 if not row[yIdx] else float(row[yIdx])
             except:
                 continue
 
-            if t != currentTime and currentTime is not None:
-                timeline.append((currentTime, tAggregates.copy()))
+            if g != currentGroup and currentGroup is not None:
+                groups.append((currentGroup, gAggregates.copy()))
 
-            if x not in tAggregates:
-                tAggregates[x] = 0
-            tAggregates[x] += y
-            currentTime = t
+            if x not in gAggregates:
+                gAggregates[x] = 0
+            gAggregates[x] += y
+            currentGroup = g
 
-        # add last time
-        if tAggregates:
-            timeline.append((currentTime, tAggregates))
+        # add last group
+        if gAggregates:
+            groups.append((currentGroup, gAggregates))
 
-        self.cache[key] = timeline
-        return timeline
+        self.cache[key] = groups
+        return groups
 
     @staticmethod
     def load(filepath):
@@ -169,17 +169,21 @@ class DataSet:
         # preprocess data to get graphable fields
         dataFields = []
 
-        rowSample = rows[:min(20, len(rows))]
+        rowSample = rows[:min(1000, len(rows))]
         for idx, field in enumerate(fields):
             floatCounter = 0
+            totalCounter = 0
             for row in rowSample:
                 fieldValue = row[idx]
+                if not fieldValue:
+                    continue
+                totalCounter += 1
                 try:
                     _ = float(fieldValue)
                     floatCounter += 1
                 except:
                     pass
-            isNumeric = floatCounter > (len(rowSample) / 2)
+            isNumeric = floatCounter > (totalCounter / 2)
             dataFields.append(DataField(field, isNumeric))
 
         return DataSet(dataFields, rows)

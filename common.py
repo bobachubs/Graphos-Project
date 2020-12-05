@@ -9,10 +9,11 @@ class GraphMode(Enum):
     Histogram = 1
     Scatter = 2
     Bar = 3
-    Timeline = 4
+    Groups = 4
 
 class GraphOptions:
     def __init__(self):
         self.mode = None
         self.x = None
         self.y = None
+        self.group = None
