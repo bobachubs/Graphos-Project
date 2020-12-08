@@ -6,6 +6,7 @@ class AppPage(Enum):
     Home = 1
     Options = 2
     Graph = 3
+    Twitter = 4
 
 class GraphMode(Enum):
     Histogram = 1

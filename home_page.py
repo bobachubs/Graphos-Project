@@ -4,6 +4,7 @@ from tkinter import filedialog
 
 from data_manager import DataSet
 from definitions import *
+from twitter_word_cloud import *
 
 def drawHome(app, canvas):
 
@@ -27,6 +28,9 @@ def homePageMousePressed(app, event):
     if 850 < event.x < 975 and 200 < event.y < 250:
         app.data = DataSet.load('nba_stats.csv')
         app.page = AppPage.Options
+    elif 500 < event.x < 625 and 200 < event.y < 250:
+        app.page = AppPage.Twitter
+        app.data = TwitterWordCloud()
     elif 575 < event.x < 700 and 600 < event.y < 700:
         path = filedialog.askopenfilename(initialdir=os.getcwd(), title='Select data file: ',filetypes = (('csv file','*.csv'),('all files','*.*')))
         if path == '': 

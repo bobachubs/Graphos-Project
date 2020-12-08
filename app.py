@@ -6,6 +6,7 @@ from graph_page import *
 from home_page import *
 from image_manager import *
 from options_page import *
+from twitter_page import *
 
 def mousePressed(app, event):
     app.mousePressedEvent = event
@@ -28,19 +29,26 @@ def mouseMoved(app, event):
     app.mouseMovedEvent = event
 
 def keyPressed(app, event):
-    if app.options.mode == GraphMode.Groups:
+    if app.page == AppPage.Graph:
+        if app.options.mode == GraphMode.Groups:
+            if event.key == 'Space':
+                app.animate = not app.animate
+            elif event.key == 's':
+                app.groupIdx += 1
+    elif app.page == AppPage.Twitter:
         if event.key == 'Space':
+            if not app.animate:
+                app.data.run()
+            else:
+                app.data.stop()
             app.animate = not app.animate
-        elif event.key == 's':
-            app.groupIdx += 1
 
 def timerFired(app):
     if app.animate:
         app.groupIdx += 1
 
 def appStarted(app):
-    app.page = AppPage.Options
-    app.data = DataSet.load('nba_stats.csv')
+    app.page = AppPage.Home
     app.colorManager = ColorManager()
     app.imageManager = ImageManager.load(app)
     app.mouseMovedEvent = None
@@ -74,6 +82,8 @@ def redrawAll(app, canvas):
             drawBar(app, canvas)
         elif app.options.mode == GraphMode.Groups:
             drawGroups(app, canvas)
+    elif app.page == AppPage.Twitter:
+        drawTwitter(app, canvas)
 
 def main():
     runApp(width=1280, height=800)
