@@ -1,38 +1,34 @@
 from color_manager import *
 from cmu_112_graphics import *
-from common import *
 from data_manager import *
-from enum import Enum
+from definitions import *
 from graph_page import *
 from home_page import *
 from image_manager import *
 from options_page import *
 
 def mousePressed(app, event):
+    app.mousePressedEvent = event
     if app.page == AppPage.Home:
-        # todo: values should be variables imported
         homePageMousePressed(app, event)
     elif app.page == AppPage.Options:
         optionsPageMousePressed(app, event)
     elif app.page == AppPage.Graph:
         graphPageMousePressed(app, event)
 
+def mouseReleased(app, event):
+    if app.page == AppPage.Graph:
+        graphPageMouseReleased(app, event)
+
+def mouseDragged(app, event):
+    if app.page == AppPage.Graph:
+        graphPageMouseDragged(app, event)
 
 def mouseMoved(app, event):
     app.mouseMovedEvent = event
 
 def keyPressed(app, event):
-    if event.key == 'm':
-        app.animate = False
-        if app.options.mode == GraphMode.Histogram:
-            app.options.mode = GraphMode.Scatter
-        elif app.options.mode == GraphMode.Scatter:
-            app.options.mode = GraphMode.Bar
-        elif app.options.mode == GraphMode.Bar:
-            app.options.mode = GraphMode.Groups
-        elif app.options.mode == GraphMode.Groups:
-            app.options.mode = GraphMode.Histogram
-    elif app.options.mode == GraphMode.Groups:
+    if app.options.mode == GraphMode.Groups:
         if event.key == 'Space':
             app.animate = not app.animate
         elif event.key == 's':
@@ -43,10 +39,12 @@ def timerFired(app):
         app.groupIdx += 1
 
 def appStarted(app):
-    app.page = AppPage.Home
+    app.page = AppPage.Options
+    app.data = DataSet.load('nba_stats.csv')
     app.colorManager = ColorManager()
     app.imageManager = ImageManager.load(app)
     app.mouseMovedEvent = None
+    app.mousePressedEvent = None
 
     # Home
     app.dataPath = None
@@ -55,11 +53,10 @@ def appStarted(app):
     app.options = GraphOptions()
 
     # Graph
-    # todo remove later
-    app.data = DataSet.load('nba_stats.csv')
     app.animate = False
     app.groupIdx = 1
     app.timerDelay = 100
+    app.isScatterDragging = False
 
 def redrawAll(app, canvas):
     if app.page == AppPage.Home:
@@ -71,6 +68,8 @@ def redrawAll(app, canvas):
             drawHistogram(app, canvas)
         elif app.options.mode == GraphMode.Scatter:
             drawScatter(app, canvas)
+            drawRegressionLine(app, canvas)
+            drawRegressionEquation(app, canvas)
         elif app.options.mode == GraphMode.Bar:
             drawBar(app, canvas)
         elif app.options.mode == GraphMode.Groups:

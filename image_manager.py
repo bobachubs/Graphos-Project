@@ -7,12 +7,16 @@ class ImageManager:
     def load(app):
         imageManager = ImageManager()
 
-        # urlArrow from https://material.io/resources/icons/?icon=double_arrow&style=twotone
-        # urlTwitter from https://assets.stickpng.com/images/580b57fcd9996e24bc43c53e.png
-        # urlNBA from https://cdn.freebiesupply.com/images/large/2x/nba-logo-transparent.png
-        # urlFile from https://material.io/resources/icons/?icon=folder_open&style=baseline
+        # imagelArrow and imageArrowGo:
+        # https://material.io/resources/icons/?icon=double_arrow&style=twotone
+        # imageTwitter:
+        # https://assets.stickpng.com/images/580b57fcd9996e24bc43c53e.png
+        # imageNBA
+        # https://cdn.freebiesupply.com/images/large/2x/nba-logo-transparent.png
+        # imageFile
+        # https://material.io/resources/icons/?icon=folder_open&style=baseline
+        # loading image idea from https://www.cs.cmu.edu/~112/notes/notes-animations-part3.html#loadImageUsingUrl
         
-
         imageArrow = app.scaleImage(app.loadImage('images/arrow.png'), 1)
         imageArrowGo = app.scaleImage(app.loadImage('images/go.png'), 1)
         imageTwitter = app.scaleImage(app.loadImage('images/twitter.png'), 1)
@@ -26,13 +30,6 @@ class ImageManager:
         imageManager.cache['file'] = imageFile
 
         return imageManager
-    
+
     def getImage(self, key):
         return self.cache.get(key)
-
-
-# def drawBackButton(app, canvas):
-#     canvas.create_image(50, 50, image=ImageTk.PhotoImage(app.imageManager.getImage('arrow')))
-
-        # if 1205 < event.x < 1235 and 735 < event.y < 765:
-        #     mode.app.setActiveMode(mode.app.optionsMenuMode)

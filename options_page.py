@@ -1,5 +1,7 @@
-from common import *
 from PIL import Image, ImageTk
+from definitions import *
+
+# enumerating structure taught by acquaintance but code self-written
 
 modes = [
     ('Histogram', GraphMode.Histogram),
@@ -8,7 +10,6 @@ modes = [
     ('Bar Groups', GraphMode.Groups),
 ]
 
-scatterRangeAttributes = ['xMin', 'xMax', 'yMin', 'yMax']
 
 def modeButtonPositions():
     positions = []
@@ -61,19 +62,6 @@ def groupButtonPositions(fieldStrings):
 
     return positionsG
 
-def scatterRangeButtonPositions():
-    positionsR = []
-
-    x = 800
-    y = 350
-    boxWidth = 150
-    boxHeight = 40
-    for value in scatterRangeAttributes:
-        positionsR.append((x + boxWidth/2, y-boxHeight/2, x + 3*boxWidth/2, y + boxHeight/2))
-        y += boxHeight
-
-    return positionsR
-
 def optionsPageMousePressed(app, event):
     # back button
     if 50 < event.x < 100 and 30 < event.y < 70:
@@ -82,15 +70,15 @@ def optionsPageMousePressed(app, event):
 
     # go button
     if 1180 < event.x < 1230 and 730 < event.y < 770:
-      if app.options.mode == GraphMode.Histogram:
-          if app.options.x != None:
-              app.page = AppPage.Graph
-      elif app.options.mode == GraphMode.Groups:
-          if all((var is not None for var in [app.options.x, app.options.y, app.options.group])):
-              app.page = AppPage.Graph
-      else:
-          if app.options.x != None and app.options.y != None:
-              app.page = AppPage.Graph
+        if app.options.mode == GraphMode.Histogram:
+            if app.options.x != None:
+                app.page = AppPage.Graph
+        elif app.options.mode == GraphMode.Groups:
+            if all((var is not None for var in [app.options.x, app.options.y, app.options.group])):
+                app.page = AppPage.Graph
+        else:
+            if app.options.x != None and app.options.y != None:
+                app.page = AppPage.Graph
 
     # mode selection
     for (idx, (x0, y0, x1, y1)) in enumerate(modeButtonPositions()):
@@ -98,7 +86,6 @@ def optionsPageMousePressed(app, event):
             newOptions = GraphOptions()
             newOptions.mode = modes[idx][1]
             app.options = newOptions
-            break
 
     # x-variable selection
     if app.options.mode in [GraphMode.Histogram, GraphMode.Scatter]:
@@ -127,19 +114,6 @@ def optionsPageMousePressed(app, event):
         for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):
             if x0 < event.x < x1 and y0 < event.y < y1:
                 app.options.group = gVariables[idx]
-                break
-
-    # scatter range selection
-    if app.options.mode == GraphMode.Scatter:
-        positionsR = scatterRangeButtonPositions()
-        for (idx, (x0, y0, x1, y1)) in enumerate(positionsR):
-            attribute = scatterRangeAttributes[idx]
-            if x0 < event.x < x1 and y0 < event.y < y1:
-                try:
-                    inputValue = float(app.getUserInput(attribute))
-                except:
-                    inputValue = None
-                setattr(app.options, attribute, inputValue)
                 break
 
 def drawOptions(app, canvas):
@@ -202,12 +176,3 @@ def drawOptions(app, canvas):
             gVar = gVariables[idx]
             canvas.create_rectangle(x0, y0, x1, y1, fill='black' if app.options.group == gVar else None)
             canvas.create_text((x0 + x1) / 2, (y0 + y1) / 2, text=gVar, fill='white' if app.options.group == gVar else 'black')
-
-    # scatter range option
-    if app.options.mode == GraphMode.Scatter:
-        canvas.create_text(720, 300, text='Y-Range', font='Arial 22 bold', anchor='w')
-        positionsR = scatterRangeButtonPositions()
-        for (idx, (x0, y0, x1, y1)) in enumerate(positionsR):
-            attribute = scatterRangeAttributes[idx]
-            canvas.create_rectangle(x0, y0, x1, y1)
-            canvas.create_text((x0+x1)/2, (y0+y1)/2, text=f'{attribute}={getattr(app.options, attribute)}')

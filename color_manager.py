@@ -1,3 +1,6 @@
+# colors taken from http://www.science.smith.edu/dftwiki/index.php/Color_Charts_for_TKinter
+# by -D. Thiebaut (talk) 17:02, 13 April 2014 (EDT)
+
 COLORS = ['snow', 'ghost white', 'white smoke', 'gainsboro', 'floral white', 'old lace',
     'linen', 'antique white', 'papaya whip', 'blanched almond', 'bisque', 'peach puff',
     'navajo white', 'lemon chiffon', 'mint cream', 'azure', 'alice blue', 'lavender',

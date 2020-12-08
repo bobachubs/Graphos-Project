@@ -1,9 +1,12 @@
-'''
-From raw csv NBA dataset, build a new csv of games_details.csv with the
-addition of a time field mapped to the date of the game from games.csv
-'''
+# From raw csv NBA dataset, build a new csv of games_details.csv with the
+# addition of a time field mapped to the date of the game from games.csv
+# nba dataset by Nathan Lauga
+# https://www.kaggle.com/nathanlauga/nba-games
 
 import csv
+# same with data_manager.py, csv reading help and lambada from pythondoc
+# but code self-written
+# https://stackoverflow.com/questions/16310015/what-does-this-mean-key-lambda-x-x1
 
 gameIdToDate = {}
 with open('games.csv') as csvfile:
@@ -19,6 +22,7 @@ dataRows = []
 with open('games_details.csv') as csvfile:
     reader = csv.reader(csvfile, delimiter=',') 
 
+# line 23 help and guidance from acquaintance to help code flow
     fieldRow = next(reader)
     fieldRow.append('TIME')
 

@@ -1,11 +1,15 @@
 import csv
 import math
 
+# https://docs.python.org/3/library/csv.html for reading csv files
 
 class DataField:
     def __init__(self, name, isNumeric):
         self.name = name
         self.isNumeric = isNumeric
+
+# additions from acquaintance to fix some buggy code: 
+# lines 28, 52, 78-79, 119-120, 144-146 using next()
 
 class DataSet:
     def __init__(self, fields, data):
@@ -43,6 +47,7 @@ class DataSet:
             bucketRange = math.floor((maxValue -  minValue) / 11)
             numericBuckets = [[v, v + bucketRange, 0] for v in range(minValue, maxValue + bucketRange, bucketRange)]
 
+        # https://stackoverflow.com/questions/16310015/what-does-this-mean-key-lambda-x-x1
         bucketIdx = 0
         for (value, count) in sorted(histogramCounts.items(), key=lambda p: p[0]):
             for idx in range(bucketIdx, len(numericBuckets)):
@@ -64,9 +69,9 @@ class DataSet:
         return histogramBuckets
 
     # returns a tuple ([(x, y), ...], xMin, xMax, yMin, yMax]
-    def getScatterData(self, xfieldString, yfieldString, xMinOpt=None, xMaxOpt=None, yMinOpt=None, yMaxOpt=None):
+    def getScatterData(self, xfieldString, yfieldString):
         # assumes both x, y are numeric
-        key = f'{xfieldString}-{yfieldString}-{xMinOpt}-{xMaxOpt}-{yMinOpt}-{yMaxOpt}-scatterplot'
+        key = f'{xfieldString}-{yfieldString}-scatterplot'
         if key in self.cache:
             return self.cache[key]
 
@@ -83,15 +88,6 @@ class DataSet:
                 x = 0 if not row[xIdx] else float(row[xIdx])
                 y = 0 if not row[yIdx] else float(row[yIdx])
             except:
-                continue
-
-            if xMinOpt != None and x < xMinOpt:
-                continue
-            if xMaxOpt != None and x > xMaxOpt:
-                continue
-            if yMinOpt != None and y < yMinOpt:
-                continue
-            if yMaxOpt != None and y > yMaxOpt:
                 continue
 
             points.add((x, y))
@@ -167,6 +163,7 @@ class DataSet:
         self.cache[key] = groups
         return groups
 
+# learned csv reading from pythondoc
     @staticmethod
     def load(filepath):
         # todo - csv module is slow, explore pandas and alternatives after MVP

@@ -2,11 +2,13 @@ import os
 from PIL import Image, ImageTk
 from tkinter import filedialog
 
-from common import *
 from data_manager import DataSet
+from definitions import *
 
 def drawHome(app, canvas):
 
+    # learned how to use Image and ImageTk from:
+    # https://www.cs.cmu.edu/~112/notes/notes-animations-part3.html#loadImageUsingUrl
     canvas.create_image(400, 300, image=ImageTk.PhotoImage(app.imageManager.getImage('twitter')))
     canvas.create_image(750, 300, image=ImageTk.PhotoImage(app.imageManager.getImage('NBA')))
     canvas.create_image(app.width/2, 650, image=ImageTk.PhotoImage(app.imageManager.getImage('file')))

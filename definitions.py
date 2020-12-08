@@ -1,5 +1,7 @@
 from enum import Enum
 
+# structural advice on class organization from acquaintance but code self-written
+
 class AppPage(Enum):
     Home = 1
     Options = 2
@@ -17,7 +19,8 @@ class GraphOptions:
         self.x = None
         self.y = None
         self.group = None
-        self.xMin = None
-        self.xMax = None
-        self.yMin = None
-        self.yMax = None
+        self.scatterOffsetX = 0
+        self.scatterOffsetY = 0
+        self.prevScatterOffsetX = 0
+        self.prevScatterOffsetY = 0
+        self.zoomFactor = 1.0
