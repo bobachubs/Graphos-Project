@@ -9,7 +9,7 @@ rates = [
 ]
 
 zoomFactors = [
-    0.5, 0.75, 1.0, 1.5, 2.0, 3.0,
+    '-', ' ', '+'
 ]
 
 def drawBackButton(app, canvas):
@@ -37,20 +37,22 @@ def drawVisualRates(app, canvas):
 
 def zoomButtonPositions():
     positions = []
-    x = 800
+    x = 900
     y = 40
     boxWidth = 40
     boxHeight = 30
     for _ in zoomFactors:
-        positions.append((x, y, x+boxWidth, y+boxHeight))
-        x += boxWidth
+            positions.append((x, y, x+boxWidth, y+boxWidth))
+            x+=boxWidth
     return positions
 
 def drawZoomOptions(app, canvas):
     for (idx, (x0, y0, x1, y1)) in enumerate(zoomButtonPositions()):
-        zoom = zoomFactors[idx]
-        canvas.create_rectangle(x0, y0, x1, y1, fill='black' if app.options.zoomFactor == zoom else 'white')
-        canvas.create_text((x0+x1)/2, (y0+y1)/2, text=f'{zoom}x', font='Arial 16', fill='white' if app.options.zoomFactor == zoom else 'black')
+        canvas.create_rectangle(x0, y0, x1, y1)
+        if idx == 1:
+            canvas.create_text((x0 + x1)/2, (y0 + y1)/2, text = f'{round(app.options.zoomFactor, 2)}', font = 'Arial 16')
+        else:
+            canvas.create_text((x0 + x1)/2, (y0 + y1)/2, text = f'{zoomFactors[idx]}', font = 'Arial 16')
 
 def graphPageMousePressed(app, event):
     if 50 < event.x < 100 and 30 < event.y < 70:
@@ -85,7 +87,19 @@ def graphPageMousePressed(app, event):
         # Scatter zoom
         for (idx, (x0, y0, x1, y1)) in enumerate(zoomButtonPositions()):
             if x0 < event.x < x1 and y0 < event.y < y1:
-                app.options.zoomFactor = zoomFactors[idx]
+                if idx == 0:
+                    if app.options.zoomFactor == 0.25:
+                        continue
+                    if app.options.zoomFactor > 0:
+                        app.options.zoomFactor -= 0.25
+                elif idx == 1: 
+                    app.userZoomInput = round(float(app.getUserInput('Enter zoom factor: ')),2)
+                    if app.userZoomInput <= 0:
+                        app.userZoomInput = 1
+                    app.options.zoomFactor = app.userZoomInput
+                else:
+                    app.options.zoomFactor += 0.25
+
 
 def graphPageMouseReleased(app, event):
     app.isScatterDragging = False
@@ -319,6 +333,6 @@ def drawGroups(app, canvas):
         canvas.create_text(x1 + 20 , (y0 + y1) / 2, text=f'{str(round(yvar, 2))}', font='Arial 12')
         h += 60
 
-    canvas.create_text(app.width/2, 20, text=f'{app.options.y} by {app.options.x} over {app.options.group}', font='Arial 20')
-    canvas.create_text(app.width/2, 55, text=f'(P to Start/Pause and S to Step)', font='Arial 12')
+    canvas.create_text(app.width/2, 25, text=f'{app.options.y} by {app.options.x} over {app.options.group}', font='Arial 20')
+    canvas.create_text(app.width/2, 55, text=f'(Space to Start/Pause and S to Step)', font='Arial 12')
     canvas.create_text(280, 50, text=f'{app.options.group} : {group}', font='Arial 18', anchor='w')

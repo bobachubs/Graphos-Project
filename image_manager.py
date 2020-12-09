@@ -15,6 +15,8 @@ class ImageManager:
         # https://cdn.freebiesupply.com/images/large/2x/nba-logo-transparent.png
         # imageFile
         # https://material.io/resources/icons/?icon=folder_open&style=baseline
+        # imageInfo
+        # https://material.io/resources/icons/?icon=live_help&style=baseline
         # loading image idea from https://www.cs.cmu.edu/~112/notes/notes-animations-part3.html#loadImageUsingUrl
         
         imageArrow = app.scaleImage(app.loadImage('images/arrow.png'), 1)
@@ -22,12 +24,14 @@ class ImageManager:
         imageTwitter = app.scaleImage(app.loadImage('images/twitter.png'), 1)
         imageNBA = app.scaleImage(app.loadImage('images/nba.png'), 1)
         imageFile = app.scaleImage(app.loadImage('images/file.png'), 1)
+        imageInfo = app.scaleImage(app.loadImage('images/info.png'), 1)
 
         imageManager.cache['arrow'] = imageArrow
         imageManager.cache['go'] = imageArrowGo
         imageManager.cache['twitter'] = imageTwitter
         imageManager.cache['NBA'] = imageNBA
         imageManager.cache['file'] = imageFile
+        imageManager.cache['info'] = imageInfo
 
         return imageManager
 

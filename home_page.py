@@ -13,6 +13,7 @@ def drawHome(app, canvas):
     canvas.create_image(400, 300, image=ImageTk.PhotoImage(app.imageManager.getImage('twitter')))
     canvas.create_image(750, 300, image=ImageTk.PhotoImage(app.imageManager.getImage('NBA')))
     canvas.create_image(app.width/2, 650, image=ImageTk.PhotoImage(app.imageManager.getImage('file')))
+    canvas.create_image(1205, 750, image=ImageTk.PhotoImage(app.imageManager.getImage('info')))
 
     font = 'Arial 26 bold'
     canvas.create_text(app.width/2, 75, text='WELCOME TO GRAPHOS!', font=font)
@@ -28,6 +29,8 @@ def homePageMousePressed(app, event):
     if 850 < event.x < 975 and 200 < event.y < 250:
         app.data = DataSet.load('nba_stats.csv')
         app.page = AppPage.Options
+    elif 1180 < event.x < 1230 and 720 < event.y < 770:
+        app.page = AppPage.Info
     elif 500 < event.x < 625 and 200 < event.y < 250:
         app.page = AppPage.Twitter
         app.data = TwitterWordCloud()

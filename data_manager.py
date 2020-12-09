@@ -133,15 +133,25 @@ class DataSet:
             return self.cache[key]
 
         gIdx = next(i for i,v in enumerate(self.fields) if v.name == groupFieldString)
+        isGroupNumeric = self.fields[gIdx].isNumeric
         xIdx = next(i for i,v in enumerate(self.fields) if v.name == xfieldString)
         yIdx = next(i for i,v in enumerate(self.fields) if v.name == yfieldString)
 
         groups = []
         gAggregates = {}
         currentGroup = None
-        sortedData = sorted(self.data, key=lambda x: x[gIdx])
+
+        def groupValue(row):
+            if not isGroupNumeric:
+                return row[gIdx]
+            try:
+                return float(row[gIdx])
+            except:
+                return 0.0
+
+        sortedData = sorted(self.data, key=groupValue)
         for row in sortedData:
-            g = row[gIdx]
+            g = groupValue(row)
             x = row[xIdx]
             try:
                 y = 0 if not row[yIdx] else float(row[yIdx])

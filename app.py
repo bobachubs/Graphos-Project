@@ -7,6 +7,7 @@ from home_page import *
 from image_manager import *
 from options_page import *
 from twitter_page import *
+from info_page import *
 
 def mousePressed(app, event):
     app.mousePressedEvent = event
@@ -16,6 +17,10 @@ def mousePressed(app, event):
         optionsPageMousePressed(app, event)
     elif app.page == AppPage.Graph:
         graphPageMousePressed(app, event)
+    elif app.page == AppPage.Twitter:
+        twitterPageMousePressed(app, event)
+    elif app.page == AppPage.Info:
+        infoPageMousePressed(app, event)
 
 def mouseReleased(app, event):
     if app.page == AppPage.Graph:
@@ -65,6 +70,11 @@ def appStarted(app):
     app.groupIdx = 1
     app.timerDelay = 100
     app.isScatterDragging = False
+    app.userZoomInput = 1
+
+def appStopped(app):
+    if app.page == AppPage.Twitter:
+        app.data.stop()
 
 def redrawAll(app, canvas):
     if app.page == AppPage.Home:
@@ -84,6 +94,8 @@ def redrawAll(app, canvas):
             drawGroups(app, canvas)
     elif app.page == AppPage.Twitter:
         drawTwitter(app, canvas)
+    elif app.page == AppPage.Info:
+        drawInfo(app, canvas)
 
 def main():
     runApp(width=1280, height=800)

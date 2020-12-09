@@ -19,7 +19,7 @@ def modeButtonPositions():
     boxWidth = 400
     boxHeight = 40
     for _ in modes:
-        positions.append((x, y, x + boxWidth, y + boxHeight))
+        positions.append((x, y - boxHeight/2, x + boxWidth, y + boxHeight/2))
         y += boxHeight
     return positions
 
@@ -109,7 +109,7 @@ def optionsPageMousePressed(app, event):
 
     # group selection
     if app.options.mode == GraphMode.Groups:
-        gVariables = [f.name for f in app.data.fields if f.name.lower() in ['time', 'date']]
+        gVariables = [f.name for f in app.data.fields if f.isNumeric or f.name.lower() in ['time', 'date']]
         positionsG = groupButtonPositions(gVariables)
         for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):
             if x0 < event.x < x1 and y0 < event.y < y1:
@@ -128,9 +128,9 @@ def drawOptions(app, canvas):
         buttonHeight = y1 - y0
         r = buttonHeight / 4
         mode = modes[idx][1]
-        canvas.create_oval(x0, y0 - r, x0 + r * 2, y0 + r, fill='black' if app.options.mode == mode else None)
+        canvas.create_oval(x0, y0+r, x0 + r*2, y0+3*r, fill='black' if app.options.mode == mode else None)
         modeString = modes[idx][0]
-        canvas.create_text(x0 + r * 3, y0, text=modeString, font='Arial 18', anchor='w')
+        canvas.create_text(x0 + r*3, y0 + buttonHeight/2, text=modeString, font='Arial 18', anchor='w')
 
     if not app.options.mode:
         return
@@ -169,7 +169,7 @@ def drawOptions(app, canvas):
     if app.options.mode == GraphMode.Groups:
         canvas.create_text(720, 300, text='Group', font='Arial 22 bold', anchor='w')
 
-        gVariables = [f.name for f in app.data.fields if f.name.lower() in ['time', 'date']]
+        gVariables = [f.name for f in app.data.fields if f.isNumeric or f.name.lower() in ['time', 'date']]
 
         positionsG = groupButtonPositions(gVariables)
         for (idx, (x0, y0, x1, y1)) in enumerate(positionsG):
