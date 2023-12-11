@@ -4,9 +4,8 @@
 # https://www.kaggle.com/nathanlauga/nba-games
 
 import csv
-# same with data_manager.py, csv reading help and lambada from pythondoc
-# but code self-written
-# https://stackoverflow.com/questions/16310015/what-does-this-mean-key-lambda-x-x1
+# same with data_manager.py, csv reading help and lambda from pythondoc
+# lines 42
 
 gameIdToDate = {}
 with open('games.csv') as csvfile:

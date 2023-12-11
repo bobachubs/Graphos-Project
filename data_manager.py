@@ -1,15 +1,15 @@
+# manages all the data grouping and bucketing for the graph options through csv file reading 
 import csv
 import math
 
-# https://docs.python.org/3/library/csv.html for reading csv files
-
+# csv code self-written, but pythondoc and internet for self-teaching
 class DataField:
     def __init__(self, name, isNumeric):
         self.name = name
         self.isNumeric = isNumeric
 
-# additions from acquaintance to fix some buggy code: 
-# lines 28, 52, 78-79, 119-120, 144-146 using next()
+# additions taught by acquaintance to make buggy code work:
+# lines 29, 79-80, 111-112, 136 138-139, 182 using next()
 
 class DataSet:
     def __init__(self, fields, data):
@@ -47,6 +47,7 @@ class DataSet:
             bucketRange = math.floor((maxValue -  minValue) / 11)
             numericBuckets = [[v, v + bucketRange, 0] for v in range(minValue, maxValue + bucketRange, bucketRange)]
 
+        # structure and implementaion of key=lambda taken from
         # https://stackoverflow.com/questions/16310015/what-does-this-mean-key-lambda-x-x1
         bucketIdx = 0
         for (value, count) in sorted(histogramCounts.items(), key=lambda p: p[0]):
@@ -173,10 +174,9 @@ class DataSet:
         self.cache[key] = groups
         return groups
 
-# learned csv reading from pythondoc
+    # csv reading learned frmo  https://docs.python.org/3/library/csv.html
     @staticmethod
     def load(filepath):
-        # todo - csv module is slow, explore pandas and alternatives after MVP
         with open(filepath) as csvfile:
             reader = csv.reader(csvfile, delimiter=',')
             fields = next(reader)

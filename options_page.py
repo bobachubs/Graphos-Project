@@ -1,7 +1,8 @@
+# draws all the graphModes and Variable options for the options page
+# enumerating structure taught by acquaintance but eventually learned and completely self-written
+
 from PIL import Image, ImageTk
 from definitions import *
-
-# enumerating structure taught by acquaintance but code self-written
 
 modes = [
     ('Histogram', GraphMode.Histogram),

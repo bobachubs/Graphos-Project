@@ -1,3 +1,4 @@
+# draws the info page
 import os
 from PIL import Image, ImageTk
 

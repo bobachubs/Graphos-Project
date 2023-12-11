@@ -1,4 +1,4 @@
-# cmu_112_graphics.py
+# cmu_112_graphics.py, ENTIRE FILE TAKEN FROM 15112 CLASS COURSE WEBSITE!
 # version 0.8.6
 
 # Pre-release for CMU 15-112-f20

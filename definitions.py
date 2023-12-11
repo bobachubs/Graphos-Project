@@ -1,6 +1,8 @@
+# organizes the pages (and its variables) of the app to be called conveniently
+# Enum is a python class used for enumerations
+# class structure taught by acquaintance but code and implementation self-written
+# However, an example can be found online: https://www.tutorialspoint.com/enum-in-python
 from enum import Enum
-
-# structural advice on class organization from acquaintance but code self-written
 
 class AppPage(Enum):
     Home = 1

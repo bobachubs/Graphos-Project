@@ -1,3 +1,4 @@
+# Color manager class to be used for all graphs
 # colors taken from http://www.science.smith.edu/dftwiki/index.php/Color_Charts_for_TKinter
 # by -D. Thiebaut (talk) 17:02, 13 April 2014 (EDT)
 

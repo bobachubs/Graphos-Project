@@ -1,3 +1,4 @@
+# laods the images and draws entire home page
 import os
 from PIL import Image, ImageTk
 from tkinter import filedialog

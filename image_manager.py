@@ -1,4 +1,4 @@
-
+# sources and image class stored here to be called in multiple python files
 class ImageManager:
     def __init__(self):
         self.cache = {}

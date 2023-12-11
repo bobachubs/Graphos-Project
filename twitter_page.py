@@ -1,3 +1,4 @@
+# creates and draws the twitter page using twitter_word_cloud.py
 from PIL import ImageTk, Image
 from definitions import *
 

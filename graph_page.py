@@ -1,3 +1,4 @@
+# draws all the graph features (buttons, zooming, dragging, animation)
 from PIL import Image, ImageTk
 from definitions import *
 
@@ -282,9 +283,9 @@ def drawScatter(app, canvas):
 def drawBar(app, canvas):
     drawBackButton(app, canvas)
     aggregates = app.data.getAggregates(app.options.x, app.options.y)
-    # inspiration and guidance on how to use from acquaintance as well as 
+    # inspiration and guidance on how to use from acquaintance, also learned from  
     # https://stackoverflow.com/questions/16310015/what-does-this-mean-key-lambda-x-x1
-    # lines 213, 241
+    # lines 289, 317, but self implemented
     leaders = sorted(aggregates.items(), key=lambda p: p[1], reverse=True)[:10]
 
     # Draw rectangles from the left proportional to the target ratio

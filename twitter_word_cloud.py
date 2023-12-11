@@ -1,10 +1,12 @@
+# post MVP file: generating a real-time hashtag twitter-shaped word cloud 
+# uses Twitter's API tweety
 import os
 import tweepy
 from wordcloud import WordCloud, ImageColorGenerator
 from PIL import Image
 import numpy
 
-
+# access keys: lines 9-12 source from acquaintance on keeping keys secret
 consumer_key = os.getenv('TWITTER_API_KEY')
 consumer_secret = os.getenv('TWITTER_API_SECRET_KEY')
 access_token = os.getenv('TWITTER_ACCESS_TOKEN')
@@ -38,7 +40,7 @@ class TwitterWordCloud:
     def __init__(self):
         self.listener = TweepyStreamListener()
         # learned how to use function OAuthHandler and setting tokens from
-        # http://docs.tweepy.org/en/latest/auth_tutorial.html
+        # http://docs.tweepy.org/en/latest/auth_tutorial.html lines 41, 52-54
 
         keysMissing = not all(
             [consumer_key, consumer_secret, access_token, access_token_secret]
@@ -53,7 +55,7 @@ class TwitterWordCloud:
         self.lastWordCloud = None
 
     def run(self):
-        # todo: cite acquaintance
+        # acquaintance helped with line 62 (no credit)
         # stream data in a separate thread so main thread can draw
         # for filters, is_async from http://docs.tweepy.org/en/latest/streaming_how_to.html
         if self.stream:
@@ -70,7 +72,13 @@ class TwitterWordCloud:
         if not self.stream.running:
             return self.lastWordCloud
 
-        # twitter screenshot taken from https://www.nicepng.com/maxp/u2w7i1i1w7y3y3q8/
+        # twitter image taken from https://similarpng.com/gradient-logo-twitter-png/
+        # by Alikae Andro, but self edited aqnd screenshotted
+        # next few lines, found the parameters for creating wordcloud from:
+        # https://amueller.github.io/word_cloud/generated/wordcloud.WordCloud.html
+        # inspired to create the gradient colored text from example 3 in:
+        # https://medium.com/better-programming/create-custom-word-clouds-in-python-841563933e73
+
         outline = numpy.array(Image.open('images/tweety1.png'))
         wc = WordCloud(background_color='white', width=width, height=height,
                        mask=outline, contour_width=3, contour_color='lightblue', max_font_size=36, max_words=100)

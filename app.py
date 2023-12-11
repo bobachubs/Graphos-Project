@@ -1,3 +1,4 @@
+# Run this file! Controls all the pages and events as a wrapper
 from color_manager import *
 from cmu_112_graphics import *
 from data_manager import *
